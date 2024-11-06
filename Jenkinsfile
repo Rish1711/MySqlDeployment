@@ -12,15 +12,15 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                // Assuming the Dockerfile is stored in this Git repository
-                git 'https://github.com/Rish1711/MySqlDeployment.git'
+                // Checkout the main branch explicitly
+                git branch: 'main', url: 'https://github.com/Rish1711/MySqlDeployment.git'
             }
         }
         
         stage('Build Docker Image on Remote Host') {
             steps {
                 script {
-                    // Using the Docker plugin to build the image on the remote Docker host
+                    // Ensure Docker is available and build the image on the remote host
                     docker.build("my-mysql-image", ".", "--host=$DOCKER_HOST")
                 }
             }
@@ -29,7 +29,7 @@ pipeline {
         stage('Run MySQL Container on Remote Host') {
             steps {
                 script {
-                    // Using the Docker plugin to run the container on the remote Docker host
+                    // Ensure Docker is available and run the container
                     docker.image("my-mysql-image").run(
                         "-d --name my-mysql-container " +
                         "-e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} " +
@@ -48,6 +48,12 @@ pipeline {
             script {
                 // Show running containers on the remote host as a confirmation
                 sh "docker -H $DOCKER_HOST ps"
+            }
+        }
+        failure {
+            script {
+                // Log a message in case of failure
+                echo "Pipeline failed. Check Docker setup and credentials."
             }
         }
     }
