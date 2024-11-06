@@ -17,6 +17,7 @@ pipeline {
             }
         }
         
+        
         stage('Build Docker Image on Remote Server') {
             steps {
                 script {
