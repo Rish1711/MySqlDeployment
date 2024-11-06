@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+    
+    environment {
+        MYSQL_ROOT_PASSWORD = credentials('MYSQL_ROOT_PASSWORD') // Use Jenkins credentials for password
+        MYSQL_DATABASE = 'Plutushub'
+        MYSQL_USER = 'user_plutus'
+        MYSQL_PASSWORD = credentials('MYSQL_USER_PASSWORD')
+    }
+    
+    stages {
+        stage('Clone Repository') {
+            steps {
+                // Assuming the Dockerfile is stored in this Git repository
+                git 'https://github.com/Rish1711/MySqlDeployment.git'
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build Docker image for MySQL
+                    sh 'docker build -t my-mysql-image .'
+                }
+            }
+        }
+        
+        stage('Run MySQL Container') {
+            steps {
+                script {
+                    // Remove any existing container with the same name
+                    sh 'docker rm -f my-mysql-container || true'
+
+                    // Run a new MySQL container with the custom image
+                    sh """
+                        docker run -d \
+                        --name my-mysql-container \
+                        -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+                        -e MYSQL_DATABASE=${MYSQL_DATABASE} \
+                        -e MYSQL_USER=${MYSQL_USER} \
+                        -e MYSQL_PASSWORD=${MYSQL_PASSWORD} \
+                        -p 3306:3306 \
+                        my-mysql-image
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Show running containers as a confirmation
+                sh 'docker ps'
+            }
+        }
+        cleanup {
+            // Optional cleanup if desired
+            // sh 'docker stop my-mysql-container'
+            // sh 'docker rm my-mysql-container'
+        }
+    }
+}
