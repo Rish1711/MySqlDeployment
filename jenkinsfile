@@ -14,6 +14,7 @@ pipeline {
                 // Assuming the Dockerfile is stored in this Git repository
                 git 'https://github.com/Rish1711/MySqlDeployment.git'
             }
+            
         }
         
         stage('Build Docker Image') {
