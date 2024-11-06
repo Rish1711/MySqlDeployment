@@ -55,11 +55,5 @@ pipeline {
                 sh 'docker -H $DOCKER_HOST ps'
             }
         }
-        cleanup {
-            // Optional cleanup if desired - stop and remove the container on the remote host
-            // Uncomment the lines below to enable cleanup on remote host
-            // sh 'docker -H $DOCKER_HOST stop my-mysql-container'
-            // sh 'docker -H $DOCKER_HOST rm my-mysql-container'
-        }
     }
 }
