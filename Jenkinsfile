@@ -12,16 +12,16 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                // Cloning the Git repository from the main branch
-                git branch: 'main', url: 'https://github.com/Rish1711/MySqlDeployment.git'
+                // Assuming the Dockerfile is stored in this Git repository
+                git 'https://github.com/Rish1711/MySqlDeployment.git'
             }
         }
         
         stage('Build Docker Image on Remote Host') {
             steps {
                 script {
-                    // Build Docker image on the remote Docker server
-                    sh 'docker -H $DOCKER_HOST build -t my-mysql-image .'
+                    // Using the Docker plugin to build the image on the remote Docker host
+                    docker.build("my-mysql-image", ".", "--host=$DOCKER_HOST")
                 }
             }
         }
@@ -29,20 +29,15 @@ pipeline {
         stage('Run MySQL Container on Remote Host') {
             steps {
                 script {
-                    // Remove any existing container with the same name on the remote Docker server
-                    sh 'docker -H $DOCKER_HOST rm -f my-mysql-container || true'
-
-                    // Run a new MySQL container with the custom image on the remote Docker server
-                    sh """
-                        docker -H $DOCKER_HOST run -d \
-                        --name my-mysql-container \
-                        -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-                        -e MYSQL_DATABASE=${MYSQL_DATABASE} \
-                        -e MYSQL_USER=${MYSQL_USER} \
-                        -e MYSQL_PASSWORD=${MYSQL_PASSWORD} \
-                        -p 3306:3306 \
-                        my-mysql-image
-                    """
+                    // Using the Docker plugin to run the container on the remote Docker host
+                    docker.image("my-mysql-image").run(
+                        "-d --name my-mysql-container " +
+                        "-e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} " +
+                        "-e MYSQL_DATABASE=${MYSQL_DATABASE} " +
+                        "-e MYSQL_USER=${MYSQL_USER} " +
+                        "-e MYSQL_PASSWORD=${MYSQL_PASSWORD} " +
+                        "-p 3306:3306"
+                    )
                 }
             }
         }
@@ -52,7 +47,7 @@ pipeline {
         always {
             script {
                 // Show running containers on the remote host as a confirmation
-                sh 'docker -H $DOCKER_HOST ps'
+                sh "docker -H $DOCKER_HOST ps"
             }
         }
     }
