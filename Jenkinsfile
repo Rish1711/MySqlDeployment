@@ -52,7 +52,7 @@ pipeline {
         always {
             script {
                 // Show running containers on the remote host as a confirmation
-                sh '/usr/bin/docker -H $DOCKER_HOST ps'
+                sh 'docker -H $DOCKER_HOST ps'
             }
         }
     }
