@@ -12,8 +12,8 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                // Assuming the Dockerfile is stored in this Git repository
-                git 'https://github.com/Rish1711/MySqlDeployment.git'
+                // Cloning the Git repository from the main branch
+                git branch: 'main', url: 'https://github.com/Rish1711/MySqlDeployment.git'
             }
         }
         
