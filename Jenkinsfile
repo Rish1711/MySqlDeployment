@@ -3,8 +3,8 @@ pipeline {
     
     environment {
         MYSQL_ROOT_PASSWORD = credentials('MYSQL_ROOT_PASSWORD')
-        MYSQL_DATABASE = 'Plutushub'
-        MYSQL_USER = 'user_plutus'
+        MYSQL_DATABASE = 'alpha'
+        MYSQL_USER = 'user_alpha'
         MYSQL_PASSWORD = credentials('MYSQL_USER_PASSWORD')
         DOCKER_HOST = "tcp://13.235.100.70:2375"
     }
